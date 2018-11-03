@@ -151,103 +151,64 @@ _On Linux_ `service --status-all | grep postgresql` to check if it's running.
 
 - To start it if it's not running, do `sudo service postgresql start`.
 
-## Code along: CREATE DATABASE
+## CREATE DATABASE
 
-Use `sql-crud` as the database to hold our tables and **[psql](https://www.postgresql.org/docs/9.6/static/app-psql.html)** to interact with it.  `psql` is PostgreSQL's **command line client** which lets us execute SQL commands interactively (REPL-like) and from scripts.  `psql` has useful built in commands.
-
-```bash
-$ psql sql-crud
-psql: FATAL:  database "sql-crud" does not exist
-$
-```
-
-But first we need to create the database.  We'll use the **[CREATE DATABASE](https://www.postgresql.org/docs/9.6/static/sql-createdatabase.html)** command from within `psql`.  This is a **[SQL](https://www.postgresql.org/docs/9.6/static/sql.html)** _(Structure Query Language - see also the [Wikipedia article](http://en.wikipedia.org/wiki/SQL))_ command and requires that we wrap the database name in double quotes (i.e. `create database "sql-crud";`). A `-` is not allowed as a name character in SQL unless the name is surrounded with double-quotes.
-
-To remove a database - *be careful, this is unrecoverable* - use the [DROP DATABASE](https://www.postgresql.org/docs/9.6/static/sql-dropdatabase.html) command.
-
-Running `psql` without a parameter connects to our default database, usually named with our login.
-
-- [ ] In terminal: `psql`
-
-- [ ] In psql CLC: `CREATE DATABASE "database-name";`
-
-- [ ] Connect to the database just created: `\c database-name`
-
-  - [ ] Or connect  from the command line using the `psql` command: `psql sql-crud`
-  - [ ] `psql` has help for both its built-in commands and for SQL: `database-name=> help`
-  - [ ] Let's look at some of the help for `psql` commands.
-
-- [ ] - `-l` or `\l` lists all the databases created on the server we're connected to.
-  - `\d` (and its variations) shows information about the  objects in the current database.
-  - `\i` reads commands from a file
-
-- [ ] Now let's make sure we're in the right database: (not sure what this means but use the command exactly as is): `sql-crud=> select current_catalog;`
-
-- [ ] Because all our SQL commands are against the same database, be consistent using `database-name`.
-
-  ###### TABLES
-
-Create Table: `CREATE TABLE words (column-name DATA-TYPE, column-name DATA-TYPE, column-name DATA-TYPE);`
-
-See Table: `SELECT * FROM words;`
+Use `sql-list` as the database to hold our tables and **[psql](https://www.postgresql.org/docs/9.6/static/app-psql.html)** to interact with it.  `psql` is PostgreSQL's **command line client** which lets us execute SQL commands interactively (REPL-like) and from scripts.  `psql` has useful built in commands.
 
 
 
-## Tables
+- [ ] Access psql CLC in terminal: `psql`
 
-We create a table to define the names and types of data we want to store. PostgreSQL's documentation is extensive and excellent, and we'll want to make use of it throughout the lesson.
+- [ ] Create the database.  In psql CLC: `CREATE DATABASE "sql-list";`
 
-- [Table basics](https://www.postgresql.org/docs/9.6/static/ddl-basics.html)
-  \- a brief overview of tables in an RDBMS.
-- [Data Types](https://www.postgresql.org/docs/9.6/static/datatype.html)
-  \- the data types available in PostgreSQL.
-- [CREATE TABLE](https://www.postgresql.org/docs/9.6/static/sql-createtable.html)
-  \- detailed documentation of PostgreSQL's version of the SQL `CREATE TABLE` command.
-- [DROP TABLE](https://www.postgresql.org/docs/9.6/static/sql-droptable.html)
-  \- detailed documentation of PostgreSQL's version of the SQL `DROP TABLE` command.
+  Use the **[CREATE DATABASE](https://www.postgresql.org/docs/9.6/static/sql-createdatabase.html)** command from within `psql`.  This is a **[SQL](https://www.postgresql.org/docs/9.6/static/sql.html)** _(Structure Query Language - see also the [Wikipedia article](http://en.wikipedia.org/wiki/SQL))_ command and requires that we wrap the database name in double quotes (i.e. `create database "sql-list";`). A hyphen `-` is not allowed as a name character in SQL unless the name is surrounded with double-quotes.
 
-Note well, `DROP TABLE` is unrecoverable if it executes successfully.
+- [ ] Connect to the database just created: `\c sql-list`
 
-## Demonstration: CREATE TABLE
+  - [ ] Or connect  from the command line using: `psql sql-list`
+  - [ ] For help with built-in commands: `sql-list=> help`
+  - [ ] Be careful with running just `psql`, without an argument, because that will connect us to our default database, usually named with our login. We may then create tables inside the wrong db!
 
-By convention (the one we'll use throughout), tables are named with the pluralization of the name of the object whose data they hold. So for example, if each row of data is about a person, then the table is called people. By another convention, each table will have an `id` column that uniquely identifies each row. This unique `id` is the `PRIMARY KEY` of the table.
+- [ ] To see a list all DBs created in the server: `-l` or `\l` 
 
-We'll create a table to hold books. We'll use the first line of `data/books.csv` for the column names. What data-types should we use for each column?
+- [ ] To see information about the  objects in the current database: `\d`
 
-We'll save the SQL statement to create the books table in `scripts/library/000_create_table_books.sql`. We can execute the commands in the file using `psql <db-name> --file=<path-to-file>` or from the psql prompt using `\i <file>`.
+- [ ] To read commands from a file: \i
 
-### Code along: CREATE TABLE
+- [ ] To be sure we're in the right DB: (not sure what this means but use the command exactly as is): `sql-list=> select current_catalog;`
 
-Create a table to hold information about patients. Use the first row of `data/people.csv` for the column names. What data-types should we use for each column? We'll save the statement in `scripts/clinic/000_create_table_patients.sql`
+- [ ] Note that to be sure the commands are being executed against the DB you're in, always use the database name `sql-list`
 
-### Lab: CREATE TABLE
+- [ ] To remove a database - *be careful, this is unrecoverable* - use the [DROP DATABASE](https://www.postgresql.org/docs/9.6/static/sql-dropdatabase.html) command.
 
-Create a table to hold information about ingredients. Use the first row of `data/ingredients.csv` for the names of the columns other than `id`. Use `scripts/cookbook/000_create_table_ingredients.sql` to store the SQL statement.
+###### TABLES
 
-## Bulk load data
+We create a table to define the names and types of data we want to store. Use PostgreSQL's documentation - is extensive and excellent.
 
-- [COPY](https://www.postgresql.org/docs/9.6/static/sql-copy.html)
-  \- detailed documentation of PostgreSQL's `COPY` command for loading data in bulk.
+By convention, tables are named with the pluralization of the name of the object whose data they hold. By another convention, each table will have an `id` column that uniquely identifies each row. This unique `id` is the `PRIMARY KEY` of the table.
 
-For inserting bulk data, PostgreSQL provides the `COPY` command. We won't use that command directly, as it executes relative to the server installation, rather we'll use *psq's meta-command* `\copy` allowing us to load data relative to where we run `psql`. Bulk loading is something available with most RDBMSs, but the specific commands and capabilities vary.
+- [ ] Create Table inside sql-list DB: `CREATE TABLE words(id SERIAL PRIMARY KEY, english TEXT, spanish TEXT);`
 
-### Demonstration: COPY
+  CREATE TABLE <table_name> (column-name DATA-TYPE, column-name DATA-TYPE, column-name DATA-TYPE);
 
-Note that string literals in SQL statements are delimited by single quotes, i.e. `'`. To include a single quote in a string literal, double it, e.g. `'That''s interesting'`. This is not an issue when loading from a valid CSV file using PostgreSQL's `COPY` command or psql's `\copy` command.
+- [ ] See Table: `SELECT * FROM words;`
 
-Now we'll load data in bulk from `data/books.csv` using `\copy`. We'll store that command in `scripts/library/020_bulk_load_books.psql`
+  Shows the words table with 0 rows
 
-### Code along: COPY
+- [ ] Bulk-copy data from .`csv` file to populate *words* table: `\copy words(english,spanish) FROM '/Users/beatriz/wdi/projects-data-files/words.csv' WITH (FORMAT csv, HEADER true) `
+  For inserting bulk data, PostgreSQL provides the `COPY` command. But that command executes relative to the server installation, so it's best to use *psq's meta-command* `\copy` allowing us to load data relative to where we run `psql`. Bulk loading is something available with most RDBMSs, but the specific commands and capabilities vary.
 
-Together we'll bulk load `data/people.csv`.
+- [ ] See table again, this time we'll see a lot of rows that came from the .csv file: `SELECT * FROM words;`
 
-### Lab: COPY
+- [ ] We can save the SQL commands in a `scripts` file with a `.sql` file extension and then just run the script. To run the script from the terminal:  `psql <db-name> --file=<path-to-file>`
+  To run the script from inside psql:   `\i <file>`.
+  Example: save the SQL statement to create a words table in `scripts/library/000_create_table_words.sql`. 
 
-Bulk load `data/ingredients.csv`.
+- [ ] Store the command we used to load data in bulk:  `scripts/library/020_bulk_load_words.psql`
 
-## Retrieving rows from a table
+## Queries: Retrieving rows from a table
 
-This is about the _query_ part of Structured _Query_ Language. Query statements can run from almost trivial to highly complex. They provide a mechanism to retrieve and summarize the data in your database.
+Query statements provide a mechanism to retrieve and summarize the data in the database.
 
 - [Queries](https://www.postgresql.org/docs/9.6/static/queries.html) - TOC of the Queries section of PostgreSQL's documentation for `The SQL Language`.
 - [SELECT](https://www.postgresql.org/docs/9.6/static/sql-select.html) - detailed documentation of PostgreSQL's version of the SQL `SELECT` command.
@@ -943,6 +904,21 @@ You are not expected to create tutorial files as described in [2.1. Introduction
 - PostgreSQL documentation site including: 
   - *Create and Drop a database: https://www.postgresql.org/docs/9.5/static/tutorial-createdb.html*
   - *Create and Remove a Table: https://www.postgresql.org/docs/9.5/static/tutorial-table.html*
+
+###### PostgreSQL documentation
+
+- [Table basics](https://www.postgresql.org/docs/9.6/static/ddl-basics.html)
+  \- a brief overview of tables in an RDBMS.
+- [Data Types](https://www.postgresql.org/docs/9.6/static/datatype.html)
+  \- the data types available in PostgreSQL.
+- [CREATE TABLE](https://www.postgresql.org/docs/9.6/static/sql-createtable.html)
+  \- detailed documentation of PostgreSQL's version of the SQL `CREATE TABLE` command.
+- [DROP TABLE](https://www.postgresql.org/docs/9.6/static/sql-droptable.html)
+  \- detailed documentation of PostgreSQL's version of the SQL `DROP TABLE` command.
+
+Note well, `DROP TABLE` is unrecoverable if it executes successfully.
+
+
 
 ###### Additional Resources for Intro to Relational DBs
 
