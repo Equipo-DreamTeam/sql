@@ -145,9 +145,8 @@ _(create, read, update and delete)_, SQL, HTTP, and Rails Controller action.
 _On Macs_ you can run `brew services list` to see if PostgreSQL is running.
 
 - If the server isn't running, `status` not `started`, start it using`brew services start postgresql`.
-
-_On Linux_ `service --status-all | grep postgresql` to check if it's running.
-(it will return [ + ] if it's running and [ - ] if it's not.
+- _On Linux_ `service --status-all | grep postgresql` to check if it's running.
+  (it will return [ + ] if it's running and [ - ] if it's not.
 
 - To start it if it's not running, do `sudo service postgresql start`.
 
@@ -155,9 +154,12 @@ _On Linux_ `service --status-all | grep postgresql` to check if it's running.
 
 Use `sql-list` as the database to hold our tables and **[psql](https://www.postgresql.org/docs/9.6/static/app-psql.html)** to interact with it.  `psql` is PostgreSQL's **command line client** which lets us execute SQL commands interactively (REPL-like) and from scripts.  `psql` has useful built in commands.
 
-
-
 - [ ] Access psql CLC in terminal: `psql`
+
+- [ ] To check which client version of Postgres is installed in Mac: `SELECT version()`(run inside psql). These repo notes refer to commands for Postgres version 10.4.
+  For a cheatsheet of `mySQL` commands; see https://gist.github.com/hofmannsven/9164408.
+
+- [ ] To see a list of all DBs from the terminal: `psql -l`
 
 - [ ] Create the database.  In psql CLC: `CREATE DATABASE "sql-list";`
 
@@ -179,6 +181,8 @@ Use `sql-list` as the database to hold our tables and **[psql](https://www.postg
 
 - [ ] Note that to be sure the commands are being executed against the DB you're in, always use the database name `sql-list`
 
+- [ ] To disconnect from the DB: `Ctrl + d` or `\q`
+
 - [ ] To remove a database - *be careful, this is unrecoverable* - use the [DROP DATABASE](https://www.postgresql.org/docs/9.6/static/sql-dropdatabase.html) command.
 
 ###### TABLES
@@ -187,7 +191,9 @@ We create a table to define the names and types of data we want to store. Use Po
 
 By convention, tables are named with the pluralization of the name of the object whose data they hold. By another convention, each table will have an `id` column that uniquely identifies each row. This unique `id` is the `PRIMARY KEY` of the table.
 
-- [ ] Create Table inside sql-list DB: `CREATE TABLE words(id SERIAL PRIMARY KEY, english TEXT, spanish TEXT);`
+- [ ] See a list of all tables inside a DB: `\dt`
+
+- [ ] Create Table inside sql-list DB: `CREATE TABLE words(id SERIAL PRIMARY KEY, grouping_english TEXT, english TEXT, grouping_spanish TEXT, spanish TEXT, description_english TEXT, description_spanish TEXT);`
 
   CREATE TABLE <table_name> (column-name DATA-TYPE, column-name DATA-TYPE, column-name DATA-TYPE);
 
@@ -195,114 +201,61 @@ By convention, tables are named with the pluralization of the name of the object
 
   Shows the words table with 0 rows
 
-- [ ] Bulk-copy data from .`csv` file to populate *words* table: `\copy words(english,spanish) FROM '/Users/beatriz/wdi/projects-data-files/words.csv' WITH (FORMAT csv, HEADER true) `
-  For inserting bulk data, PostgreSQL provides the `COPY` command. But that command executes relative to the server installation, so it's best to use *psq's meta-command* `\copy` allowing us to load data relative to where we run `psql`. Bulk loading is something available with most RDBMSs, but the specific commands and capabilities vary.
+- [ ] Bulk-copy data from .`csv` file to populate *words* table: `\copy words(grouping_english, english, grouping_spanish, spanish, description_english, description_spanish) FROM '/Users/beatriz/wdi/projects-data-files/words.csv' WITH (FORMAT csv, HEADER true) `
+
+  - [ ] For inserting bulk data, PostgreSQL provides the `COPY` command. But that command executes relative to the server installation, so it's best to use *psq's meta-command* `\copy` allowing us to load data relative to where we run `psql`. Bulk loading is something available with most RDBMSs, but the specific commands and capabilities vary.
+  - [ ] Using an Excel csv file created issues. Once the file was opened as an LibreOffice document, the \copy command worked.
 
 - [ ] See table again, this time we'll see a lot of rows that came from the .csv file: `SELECT * FROM words;`
+  Press `space bar`  or `CTRL + v` to page through the table
 
 - [ ] We can save the SQL commands in a `scripts` file with a `.sql` file extension and then just run the script. To run the script from the terminal:  `psql <db-name> --file=<path-to-file>`
   To run the script from inside psql:   `\i <file>`.
   Example: save the SQL statement to create a words table in `scripts/library/000_create_table_words.sql`. 
 
-- [ ] Store the command we used to load data in bulk:  `scripts/library/020_bulk_load_words.psql`
+- [ ] Store the command we used to load data in bulk in a `.psql` file:  `scripts/library/020_bulk_load_words.psql`
 
-## Queries: Retrieving rows from a table
+- [ ] To delete a table, ex. the `words`table: `DROP TABLE IF EXISTS words;`
+  `IF EXISTS` avoids errors if the table we want to drop doesn't exist.
+  More at: http://www.postgresqltutorial.com/postgresql-drop-table/
+
+###### QUERIES: Selecting Columns, Retrieving, Sorting, & Filtering Rows
 
 Query statements provide a mechanism to retrieve and summarize the data in the database.
 
-- [Queries](https://www.postgresql.org/docs/9.6/static/queries.html) - TOC of the Queries section of PostgreSQL's documentation for `The SQL Language`.
-- [SELECT](https://www.postgresql.org/docs/9.6/static/sql-select.html) - detailed documentation of PostgreSQL's version of the SQL `SELECT` command.
+- [ ] To see all data from the `words` table: `SELECT * FROM words;`
+- [ ] To see all rows of just one column: `SELECT spanish FROM words;`
+- [ ] To sort the Spanish words from a to z: `SELECT english, spanish FROM words ORDER BY spanish ASC;` (ASC is the default sort & can be omitted)
+- [ ] To sort the English words from z to a: `SELECT english, spanish FROM words ORDER BY english DESC;`
+- [ ] To filter with the WHERE clause and the `=` operator: `SELECT english, spanish FROM words WHERE english = 'Graft';`
+- [ ] To make the above query case-insensitive: `SELECT english,spanish FROM words WHERE LOWER(english) = LOWER('graft');`
 
-### Demonstration: SELECT
+###### Adding Rows to a Table: INSERT INTO
 
-Let's see some what we can learn about the books in the database.
+- [ ] Insert rows into the `words` table: `INSERT INTO words (english, spanish) VALUES ('hello', 'hola'), ('goodbye', 'adios');`
+- [ ] Store the command in a `.sql` file:  `scripts/library/030_insert_into_words.psql`
 
-### Code along: SELECT
+###### Removing Rows from a Table: DELETE FROM
 
-Together we'll build a query to get the count of patients by gender.
+- [ ] Remove one row from the `words` table: `DELETE FROM words WHERE english = 'hello';`
+- [ ] Remove all raws from a table: `DELETE FROM <table-name>` or `TRUNCATE <table-name>`
 
-### Lab: SELECT
+###### Updating a Row
 
-Write a query to get the count of ingredients by unit.
-
-## Removing Rows from a Table
-
-- [Deleting Data](https://www.postgresql.org/docs/9.6/static/dml-delete.html)
-  \- overview of removing rows from a table
-- [DELETE](https://www.postgresql.org/docs/9.6/static/sql-delete.html) -
-  detailed documentation of PostgreSQL's version of the SQL `DELETE` command.
-- [TRUNCATE](https://www.postgresql.org/docs/9.6/static/sql-truncate.html) -
-  detailed documentation of PostgreSQL's `TRUNCATE` command.
-
-#### Code along: DELETE
-
-Let's remove the patients who's given and family names start with the same letter.
-
- `TRUNCATE <table name>;` is functionally equivalent to `DELETE FROM <table name>;`, it will remove all the rows from the table.
-
-#### Lab: DELETE
-
-Remove ingredients you wouldn't keep in your kitchen or pantry.
-
-## Changing the Structure of a Table
-
-- [Modifying Tables](https://www.postgresql.org/docs/9.6/static/ddl-alter.html)
-  \- overview of changing tables.
-- [ALTER TABLE](https://www.postgresql.org/docs/9.6/static/sql-altertable.html)
-  \- detailed documentation of PostgreSQL's version of the SQL `ALTER TABLE` command.
-
-### Demonstration: ALTER TABLE
-
-We'll add the column `isbn` to books.
-
-### Code along: ALTER TABLE
-
-We'll change the type of the columns `height` and `weight` in patients.
-
-### Lab: ALTER TABLE
-
-Add columns for macro-nutrients to ingredients.
-
-## Changing the Data in Rows of a Table
-
-- [Updating Data](https://www.postgresql.org/docs/9.6/static/dml-update.html)
-  \- overview of changing rows
-- [UPDATE](https://www.postgresql.org/docs/9.6/static/sql-update.html) -
-  detailed documentation of PostgreSQL's version of the SQL `UPDATE` command.
-
-### Demonstration: UPDATE
-
-We'll update the isbn for some books.
-
-### Code along: UPDATE
-
-Let's update some patients' weights.
-
-### Lab: UPDATE
-
-Update macro-nutrients for some ingredients.
-
-## Adding Rows to a Table
-
-- [Inserting Data](https://www.postgresql.org/docs/9.6/static/dml-insert.html)
-  \- overview of adding rows to a table.
-- [INSERT](https://www.postgresql.org/docs/9.6/static/sql-insert.html)
-  \- detailed documentation of PostgreSQL's version of the SQL `INSERT INTO`
-  command.
-
-### Demonstration: INSERT INTO
-
-Use variations of `INSERT` to add a few rows to books. Store the commands in `scripts/library/010_insert_into_books.sql`.
-
-### Code along: INSERT INTO
-
-Add a few rows to patients.
-
-### Lab: INSERT INTO
-
-Add an ingredient to the `ingredients` table using `INSERT`.
+- [ ] To update the Spanish words in the words table: `UPDATE words SET spanish = 'adios, chao, nos vemos' WHERE spanish = 'adios';`
+- [ ] Two other examples from the Postgres [docs](https://www.postgresql.org/docs/9.6/static/dml-update.html): 
+  `UPDATE products SET price = 10 WHERE price = 5;`
+  `UPDATE products SET price = price * 1.10;`
 
 
+
+###### Changing the Structure of a Table: ALTER TABLE
+
+Used to add/remove columns and/or constraints, change default values or column data types, rename columns or tables.
+
+- [ ] To add a Portuguese column to the `words` table: `ALTER TABLE words ADD COLUMN portuguese text;`
+- [ ] To drop the Portuguese column to the `words` table: `ALTER TABLE words DROP COLUMN portuguese CASCADE;` (CASCADE tells Postgres to drop everything that may be linked to the column being dropped)
+- [ ] To change a column name: `ALTER TABLE groupings RENAME COLUMN grouping_spansih TO grouping_spanish;`
 
 # An Introduction to PostgreSQL Foreign Key References
 
@@ -314,69 +267,46 @@ In the previous material on SQL we used the phrase "relational database" but did
 
 ###### Objectives
 
-By the end of this, developers should be able to:
-
 - Add a foreign key reference to an existing table.
 - Update a row setting a reference to the id of a row in another table.
 - Insert a row which includes a reference to the id of a row in another table.
 - Retrieve rows from two tables using a `JOIN` condition
 
-## Modeling relationships
+###### Creating Related Tables / Modeling (diagramming) relationships
 
-Previously we created tables to hold books for a library, patients for a clinic, and ingredients for a cookbook.
+Model (diagram) new objects (things) and their relationship to existing objects (things).
 
-- In our library, authors are stored as attributes of books.  Does that make sense?
-- Who does our clinic need to care for the patients?
-- And what does our cookbook need that includes ingredients?
+- [ ] Create a related `groupings` table:  `CREATE TABLE groupings(id SERIAL PRIMARY KEY, grouping_english TEXT, grouping_spanish TEXT);`
 
-Let's model (diagram) these new objects (things) and their relationship to our existing objects (things).
+- [ ] Use the `words` table to populate the `groupings	` table: `INSERT INTO groupings(grouping_english,grouping_spanish) SELECT DISTINCT grouping_english, grouping_spanish FROM words ORDER BY grouping_english;`
 
-## Creating related tables
+  <hr>
 
-### Demonstration: Create and populate an authors table
+- [ ] Create a related `descriptions` table:  `CREATE TABLE descriptions(id SERIAL PRIMARY KEY, description_english TEXT, description_spanish TEXT);`
 
-We'll create SQL scripts in `scripts/library` to add an `authors` table and populate it from data in the `books` table.
+- [ ] Use the `words` table to populate the `descriptions	` table: `INSERT INTO descriptions(description_english,description_spanish) SELECT DISTINCT description_english,description_spanish FROM words ORDER BY description_english;`
 
-### Code along: Create and populate a doctors table
+- [ ] Create the SQL scripts noted above.
 
-We'll create scripts in `scripts/clinic` to add a `doctors` table and populate it from `data/doctors.csv`.
 
-### Lab: Create and populate a recipes table
 
-We'll create scripts in `scripts/cookbook` to add a `recipes` table with a `name` column and a `directions` column and populate using `INSERT` statements.
 
 ## Adding references from one table to another
 
 Conventionally, a foreign key reference is named for the singular of the name of the table being referenced, with the column being referenced appended after an underscore. So if we're adding a reference to the `cities` table and its `id` column we'll create a column called `city_id`. However, _this convention should
-not be followed when there is a semantically superior name available. Can you give an example of when this convention isn't appropriate?
+not be followed when there is a semantically superior name available. 
 
-### Demonstration: Add an author reference to books
+- [ ] Add grouping_id to `words` table: `ALTER TABLE words ADD COLUMN grouping_id INTEGER REFERENCES groupings(id); CREATE INDEX ON words(grouping_id);`
+- [ ] Populate the grouping reference in the `words` table: UPDATE words SET grouping_id = groupings.id FROM groupings WHERE words.grouping_english = groupings.grouping_english AND words.grouping_spanish = groupings.grouping_spanish;
+- [ ] Remove the `grouping_english` and the `grouping_spanish` columns from the `words` table: `ALTER TABLE words DROP COLUMN grouping_english, DROP COLUMN grouping_spanish;`
 
-We'll create scripts in `scripts/library` to
+<hr>
 
-- on the `books` table, add a reference to the `id` column of the `authors`
-  table.
-- populate the author reference in the `books` table.
-- remove the `author` column from the books table.
+- [ ] Add description_id to `words` table: `ALTER TABLE words ADD COLUMN description_id INTEGER REFERENCES descriptions(id); CREATE INDEX ON words(description_id);`
+- [ ] Populate the description reference in the `words` table: `UPDATE words SET description_id = descriptions.id FROM descriptions WHERE words.description_english = descriptions.description_english AND words.description_spanish = descriptions.description_spanish;`
+- [ ] Remove the `description_english` and the `descriptiong_spanish` columns from the `words` table: `ALTER TABLE words DROP COLUMN description_english, DROP COLUMN description_spanish;`
 
-Note that references may constrain both the referenced and referencing table.
 
-### Code along: Add a doctor reference to patients
-
-We'll create scripts in `scripts/clinic` to
-
-- on the `patients` table, add a reference to the `id` column of the
-  `doctors` table.
-- populate the doctor reference in the `patients` table for a few patients.
-
-### Lab: Add a recipe reference to ingredients
-
-We'll create scripts in `scripts/cookbook` to
-
-- on the ingredients table, add a reference to the id column of the recipes table.
-- populate the recipe reference in the `ingredients` table for a few ingredients.
-
-Does this relationship seem adequate for handling actual recipes?  Why or why not?
 
 ## Retrieving rows from related tables
 
@@ -915,8 +845,27 @@ You are not expected to create tutorial files as described in [2.1. Introduction
   \- detailed documentation of PostgreSQL's version of the SQL `CREATE TABLE` command.
 - [DROP TABLE](https://www.postgresql.org/docs/9.6/static/sql-droptable.html)
   \- detailed documentation of PostgreSQL's version of the SQL `DROP TABLE` command.
-
-Note well, `DROP TABLE` is unrecoverable if it executes successfully.
+  Note well, `DROP TABLE` is unrecoverable if it executes successfully.
+- [Queries](https://www.postgresql.org/docs/9.6/static/queries.html) - TOC of the Queries section of PostgreSQL's documentation for `The SQL Language`.
+- [Inserting Data](https://www.postgresql.org/docs/9.6/static/dml-insert.html)
+  \- overview of adding rows to a table.
+- [INSERT](https://www.postgresql.org/docs/9.6/static/sql-insert.html)
+  \- detailed documentation of PostgreSQL's version of the SQL `INSERT INTO`
+  command.
+- [Deleting Data](https://www.postgresql.org/docs/9.6/static/dml-delete.html)
+  \- overview of removing rows from a table
+- [DELETE](https://www.postgresql.org/docs/9.6/static/sql-delete.html) -
+  detailed documentation of PostgreSQL's version of the SQL `DELETE` command.
+- [TRUNCATE](https://www.postgresql.org/docs/9.6/static/sql-truncate.html) -
+  detailed documentation of PostgreSQL's `TRUNCATE` command.
+- [Updating Data](https://www.postgresql.org/docs/9.6/static/dml-update.html)
+  \- overview of changing rows
+- [UPDATE](https://www.postgresql.org/docs/9.6/static/sql-update.html) -
+  detailed documentation of PostgreSQL's version of the SQL `UPDATE` command.
+- [Modifying Tables](https://www.postgresql.org/docs/9.6/static/ddl-alter.html)
+  \- overview of changing tables.
+- [ALTER TABLE](https://www.postgresql.org/docs/9.6/static/sql-altertable.html)
+  \- detailed documentation of PostgreSQL's version of the SQL `ALTER TABLE` command.
 
 
 
