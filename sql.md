@@ -1,82 +1,69 @@
 # Structured Query Language (SQL) Study
 
-| Section       | Directions SQL Study                                         |
-| ------------- | ------------------------------------------------------------ |
-| Introduction  | Use [PostgreSQL](http://www.postgresql.org/) documentation as the reference for SQL commands. |
-| Prerequisites | None                                                         |
-| Instructions  | Directions were given in separate `study.md` file.           |
+Use [PostgreSQL](http://www.postgresql.org/) documentation as the reference for SQL commands.
 
-###### Objectives SQL Study
+###### Notational conventions in the documentation
 
--   List the notational conventions used in the synopses of PostgreSQL commands.
--   List the PostgreSQL commands to create a new or remove an existing database.
--   List the SQL commands to create or remove a database table.
--   List the SQL commands used to create, read, update, and delete rows in a database table.
+Characters that denote optional parts of a command (symbol & name):
 
-## Notational conventions
+- `]` (brackets)
+- `}` and `|` () (braces and vertical lines indicate that we have to choose one alternative)
 
-Show and name the characters that denote optional parts of a command
+Characters that indicate a possible repeating element in a command (symbol & name): 
 
-```md
-`[]` brackets
-`{}` braces and `|` vertical lines indicate that we have to choose one alternative
-```
+- `..` (dots)
 
-Show and name the characters that indicate a possible repeating element in a command
+#### Misc commands for PostgreSQL
 
-```md
-`...` dots
-```
+**[PostgreSQL](https://www.postgresql.org/)** is a popular open source database server.  
+
+- [ ] To see if PostgreSQL is running:
+  - _On Macs_ you can run `brew services list`.
+    - If the server isn't running, `status` not `started`, start it using`brew services start postgresql`.
+  - _On Linux_ `service --status-all | grep postgresql` 
+    (it will return [ + ] if it's running and [ - ] if it's not.
+  - To start it if it's not running, do `sudo service postgresql start`.
+- [ ] To check which client version of Postgres is installed in Mac: `SELECT version();`(run inside psql). These repo notes refer to commands for Postgres version 10.4.
+  For a cheatsheet of `mySQL` commands; see https://gist.github.com/hofmannsven/9164408.
+- [ ] Access psql CLC in terminal: `psql`
+- [ ] See a list of all DBs from the terminal: `psql -l`
+- [ ] See a list all DBs created in the server: `-l` or `\l` 
+- [ ] See information about the  objects in the current database: `\d`
+- [ ] See a list of all tables in the current database: `\dt`
+- [ ] Read commands from a file: \i
+- [ ] To be sure we're in the right DB: (not sure what this means but use the command exactly as is): `sql-list=> select current_catalog;`
+- [ ] To disconnect from the DB: `Ctrl + d` or `\q`
+- [ ] To remove a database - *be careful, this is unrecoverable* - use the [DROP DATABASE](https://www.postgresql.org/docs/9.6/static/sql-dropdatabase.html) command.
+- [ ] Check the schema of a table i.e.  `words` table: `SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'words';`
+- [ ] Delete a table, ex. the `allfields`table: `DROP TABLE IF EXISTS allfields;`
+  `IF EXISTS` avoids errors if the table we want to drop doesn't exist.
+  More at: http://www.postgresqltutorial.com/postgresql-drop-table/
 
 ## Creating or removing a database
 
-What shell command would you execute to **create a database** named `mydb`?
+##### Using shell commands:
 
-```sh
-createdb mydb
-```
+Create a database named `mydb`: `createdb mydb`
 
-What shell command would you execute to **remove a database** named `mydb`?
+remove a database named `mydb`: `dropdb mydb`
 
-```sh
-dropdb mydb
-```
+##### Creating or removing a table
 
-## Creating or removing a table
+- The purpose of creating a table is to define the names and types of data we want to store. 
 
-What two SQL keywords precede the table name when creating a database table?
+Create a table: `CREATE TABLE`
 
-```sql
-CREATE TABLE
-```
+Remove a table: `DROP TABLE`
 
-What is the SQL command to remove a database table named `mytable`?
+##### Table row CRUD (Create Read Update Delete)
 
-```sql
-DROP TABLE
-```
+Populate a db table with rows: `INSERT INTO`
 
-## Table row CRUD
+Retrieve data from a db table: `SELECT`
 
-What two SQL keywords precede the table name when populating a database table with rows?
+Update existing rows in a db table: `UPDATE`
 
-```sql
-INSERT INTO
-```
-
-What SQL keyword starts the command to retrieve data from a database table?
-
-```sql
-SELECT
-```
-
-What SQL command is used to update existing rows in a database table?
-
-```sql
-UPDATE
-```
-
-What SQL command is used to remove rows from a database table?
+Remove rows from a db table:
 
 ```sql
 DELETE FROM <tablename> WHERE <colum_name> = <record_property>
@@ -85,24 +72,18 @@ DELETE FROM <tablename> WHERE <colum_name> = <record_property>
 - *~Careful with this command, using DELETE FROM <tablename> will delete all rows from the table.~*
 
 
+### Verb Equivalence
 
-# An introduction to relational databases
+**[CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete)**_(create, read, update and delete)_, SQL, HTTP, and Rails Controller action.
 
-###### Prerequisites to An Intro to Relational Databases
+| CRUD   | SQL    | HTTP   | Rails Controller ction |
+| :----- | :----- | :----- | :--------------------- |
+| Create | INSERT | POST   | create                 |
+| Read   | SELECT | GET    | index/show             |
+| Update | UPDATE | PATCH  | update                 |
+| Delete | DELETE | DELETE | destroy                |
 
-- A working **[PostgreSQL](https://www.postgresql.org/)** installation.
-- [SQL Study](https://git.generalassemb.ly/ga-wdi-boston/sql-study)
-
-###### Objectives of An Intro to Relational Databases
-
-- Create a database table
-- Insert a row or rows into a database table
-- Retrieve a row or rows from a database table
-- Modify a database table after creation
-- Update a row or rows in a database table
-- Delete a row or rows from a database table
-
-## Introduction
+## An introduction to relational databases
 
 Most apps need a [data store](https://en.wikipedia.org/wiki/Data_store) <u>to persist important information</u>. A relational database is the most common datastore for a web application. SQL is the language of relational databases.
 
@@ -122,48 +103,17 @@ What about more complicated data?
 
 Database tables can reference other tables which allows arbitrary nesting of groups of simple types. This is something we'll be looking at more closely later.
 
-### Relational Database Management System ([RDBMS](http://en.wikipedia.org/wiki/Relational_database_management_system))
+###### Relational Database Management System ([RDBMS](http://en.wikipedia.org/wiki/Relational_database_management_system))
 
 A **[Database Server](http://upload.wikimedia.org/wikipedia/commons/5/57/RDBMS_structure.png)** is a set of processes and files that manage the databases that store the tables. Sticking with our previous analogy a database server would map to Google Sheets (_or Excel spreadsheet_).
 
-### Verb Equivalence
-
-**[CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete)**
-_(create, read, update and delete)_, SQL, HTTP, and Rails Controller action.
-
-| CRUD   | SQL    | HTTP   | action     |
-| :----- | :----- | :----- | :--------- |
-| Create | INSERT | POST   | create     |
-| Read   | SELECT | GET    | index/show |
-| Update | UPDATE | PATCH  | update     |
-| Delete | DELETE | DELETE | destroy    |
-
-## PostgreSQL
-
-**[PostgreSQL](https://www.postgresql.org/)**, a popular open source database server, should already be installed on your computer.
-
-_On Macs_ you can run `brew services list` to see if PostgreSQL is running.
-
-- If the server isn't running, `status` not `started`, start it using`brew services start postgresql`.
-- _On Linux_ `service --status-all | grep postgresql` to check if it's running.
-  (it will return [ + ] if it's running and [ - ] if it's not.
-
-- To start it if it's not running, do `sudo service postgresql start`.
-
-## CREATE DATABASE
+#### STEPS TO CREATE A DATABASE
 
 Use `sql-list` as the database to hold our tables and **[psql](https://www.postgresql.org/docs/9.6/static/app-psql.html)** to interact with it.  `psql` is PostgreSQL's **command line client** which lets us execute SQL commands interactively (REPL-like) and from scripts.  `psql` has useful built in commands.
 
-- [ ] Access psql CLC in terminal: `psql`
-
-- [ ] To check which client version of Postgres is installed in Mac: `SELECT version()`(run inside psql). These repo notes refer to commands for Postgres version 10.4.
-  For a cheatsheet of `mySQL` commands; see https://gist.github.com/hofmannsven/9164408.
-
-- [ ] To see a list of all DBs from the terminal: `psql -l`
-
 - [ ] Create the database.  In psql CLC: `CREATE DATABASE "sql-list";`
 
-  Use the **[CREATE DATABASE](https://www.postgresql.org/docs/9.6/static/sql-createdatabase.html)** command from within `psql`.  This is a **[SQL](https://www.postgresql.org/docs/9.6/static/sql.html)** _(Structure Query Language - see also the [Wikipedia article](http://en.wikipedia.org/wiki/SQL))_ command and requires that we wrap the database name in double quotes (i.e. `create database "sql-list";`). A hyphen `-` is not allowed as a name character in SQL unless the name is surrounded with double-quotes.
+  *Use the **[CREATE DATABASE](https://www.postgresql.org/docs/9.6/static/sql-createdatabase.html)** command from within `psql`.  This is a **[SQL](https://www.postgresql.org/docs/9.6/static/sql.html)** (Structure Query Language - see also the [Wikipedia article](http://en.wikipedia.org/wiki/SQL)) command and requires that we wrap the database name in double quotes (i.e. `create database "sql-list";`). A hyphen `-` is not allowed as a name character in SQL unless the name is surrounded with double-quotes.*
 
 - [ ] Connect to the database just created: `\c sql-list`
 
@@ -171,144 +121,227 @@ Use `sql-list` as the database to hold our tables and **[psql](https://www.postg
   - [ ] For help with built-in commands: `sql-list=> help`
   - [ ] Be careful with running just `psql`, without an argument, because that will connect us to our default database, usually named with our login. We may then create tables inside the wrong db!
 
-- [ ] To see a list all DBs created in the server: `-l` or `\l` 
+- [ ] Note that to be sure the commands are being executed against the DB you're in, always use the name of the database. In the examples in this tutorial, the DB name is  `sql-list`.
 
-- [ ] To see information about the  objects in the current database: `\d`
+#### STEPS TO CREATE A TABLE
 
-- [ ] To read commands from a file: \i
+###### (Once table is created, populate it with data from a .csv file, Query its Content of Table, Make changes to Rows)
 
-- [ ] To be sure we're in the right DB: (not sure what this means but use the command exactly as is): `sql-list=> select current_catalog;`
+- By convention, *tables are named with the pluralization of the name of the object whose data they hold.* 
 
-- [ ] Note that to be sure the commands are being executed against the DB you're in, always use the database name `sql-list`
+- *By another con*vention, each table will have an `id` column that uniquely identifies each row. This unique `id` is the `PRIMARY KEY` of the table.
 
-- [ ] To disconnect from the DB: `Ctrl + d` or `\q`
+- [ ] Create `allfields` table inside sql-list DB: `CREATE TABLE allfields(id SERIAL PRIMARY KEY,groupingEnglish TEXT,english TEXT,groupingSpanish TEXT, spanish TEXT,descriptionEnglish TEXT,descriptionSpanish TEXT);`
 
-- [ ] To remove a database - *be careful, this is unrecoverable* - use the [DROP DATABASE](https://www.postgresql.org/docs/9.6/static/sql-dropdatabase.html) command.
+  *The `allfields` table is a temporary table that will hold all the data in my `cvs` file. Later, it will be broken down into separate tables.*
 
-###### TABLES
-
-We create a table to define the names and types of data we want to store. Use PostgreSQL's documentation - is extensive and excellent.
-
-By convention, tables are named with the pluralization of the name of the object whose data they hold. By another convention, each table will have an `id` column that uniquely identifies each row. This unique `id` is the `PRIMARY KEY` of the table.
-
-- [ ] See a list of all tables inside a DB: `\dt`
-
-- [ ] Create Table inside sql-list DB: `CREATE TABLE words(id SERIAL PRIMARY KEY, grouping_english TEXT, english TEXT, grouping_spanish TEXT, spanish TEXT, description_english TEXT, description_spanish TEXT);`
-
-  CREATE TABLE <table_name> (column-name DATA-TYPE, column-name DATA-TYPE, column-name DATA-TYPE);
-
-- [ ] See Table: `SELECT * FROM words;`
+- [ ] See Table: `SELECT * FROM allfields;`
 
   Shows the words table with 0 rows
 
-- [ ] Bulk-copy data from .`csv` file to populate *words* table: `\copy words(grouping_english, english, grouping_spanish, spanish, description_english, description_spanish) FROM '/Users/beatriz/wdi/projects-data-files/words.csv' WITH (FORMAT csv, HEADER true) `
+- [ ] Bulk-copy data from .`csv` file to populate *allfields* table: `\copy allfields(groupingEnglish, english, groupingSpanish, spanish, descriptionEnglish, descriptionSpanish) FROM '/Users/beatriz/wdi/projects-data-files/words.csv' WITH (FORMAT csv, HEADER true); `
 
-  - [ ] For inserting bulk data, PostgreSQL provides the `COPY` command. But that command executes relative to the server installation, so it's best to use *psq's meta-command* `\copy` allowing us to load data relative to where we run `psql`. Bulk loading is something available with most RDBMSs, but the specific commands and capabilities vary.
+  - [ ] For inserting bulk data, it's best to use *psql's meta-command* `\copy` that loads data relative to where we run `psql`.
   - [ ] Using an Excel csv file created issues. Once the file was opened as an LibreOffice document, the \copy command worked.
 
-- [ ] See table again, this time we'll see a lot of rows that came from the .csv file: `SELECT * FROM words;`
+- [ ] See table again, this time we'll see all the rows that came from the .csv file: `SELECT * FROM allfields;`
   Press `space bar`  or `CTRL + v` to page through the table
 
 - [ ] We can save the SQL commands in a `scripts` file with a `.sql` file extension and then just run the script. To run the script from the terminal:  `psql <db-name> --file=<path-to-file>`
   To run the script from inside psql:   `\i <file>`.
-  Example: save the SQL statement to create a words table in `scripts/library/000_create_table_words.sql`. 
+  Example: save the SQL statement to create a words table in `scripts/library/000_create_table_allfields.sql`. 
 
-- [ ] Store the command we used to load data in bulk in a `.psql` file:  `scripts/library/020_bulk_load_words.psql`
+- [ ] Store the command we used to load data in bulk in a `.psql` file:  `scripts/library/020_bulk_load_allfields.psql`
 
-- [ ] To delete a table, ex. the `words`table: `DROP TABLE IF EXISTS words;`
-  `IF EXISTS` avoids errors if the table we want to drop doesn't exist.
-  More at: http://www.postgresqltutorial.com/postgresql-drop-table/
+##### SIMPLE QUERIES: Selecting Columns, Retrieving, Sorting, & Filtering Rows: SELECT
 
-###### QUERIES: Selecting Columns, Retrieving, Sorting, & Filtering Rows
+Query statements are the mechanism to used to retrieve the data from the DB and summarize it, so it returns meaningful information.
 
-Query statements provide a mechanism to retrieve and summarize the data in the database.
-
-- [ ] To see all data from the `words` table: `SELECT * FROM words;`
-- [ ] To see all rows of just one column: `SELECT spanish FROM words;`
-- [ ] To sort the Spanish words from a to z: `SELECT english, spanish FROM words ORDER BY spanish ASC;` (ASC is the default sort & can be omitted)
-- [ ] To sort the English words from z to a: `SELECT english, spanish FROM words ORDER BY english DESC;`
-- [ ] To filter with the WHERE clause and the `=` operator: `SELECT english, spanish FROM words WHERE english = 'Graft';`
-- [ ] To make the above query case-insensitive: `SELECT english,spanish FROM words WHERE LOWER(english) = LOWER('graft');`
+- [ ] To see all data from the `allfields` table: `SELECT * FROM allfields;`
+- [ ] To see all rows of just one column, e.g., the `spanish` column: `SELECT spanish FROM allfields;`
+- [ ] To sort the Spanish words from a to z: `SELECT english, spanish FROM allfields ORDER BY spanish ASC;` (ASC is the default sort & can be omitted)
+- [ ] To sort the English words from z to a: `SELECT english, spanish FROM allfields ORDER BY english DESC;`
+- [ ] To filter with the WHERE clause and the `=` operator: `SELECT english, spanish FROM allfields WHERE english = 'Graft';`
+- [ ] To filter for a search term that may have more characters before or after the term, use the LIKE operator with the wildcard symbol `%` . Example: 
+  `select entry from journals WHERE entry like '%lunes%';` 
+- [ ] Examples of **case-insensitive** queries using wildcard symbol `%`:
+   `select entry from journals WHERE lower(entry) like lower('%Lunes%');` 
+  `SELECT english, spanish FROM words WHERE LOWER(english) LIKE LOWER('%stem%');`
+   `SELECT english,spanish FROM allfields WHERE LOWER(english) = LOWER('graft');`
+- [ ] **To export a query result to a `csv` file**: `COPY(SELECT english, spanish FROM allfields WHERE groupingenglish = 'stemCellTransplant ' ORDER BY english) TO '/Users/beatriz/Desktop/test/wordsStemCellTransplants.csv' DELIMITER ',' CSV HEADER;`
 
 ###### Adding Rows to a Table: INSERT INTO
 
-- [ ] Insert rows into the `words` table: `INSERT INTO words (english, spanish) VALUES ('hello', 'hola'), ('goodbye', 'adios');`
-- [ ] Store the command in a `.sql` file:  `scripts/library/030_insert_into_words.psql`
+- [ ] Insert 2 rows into the `allfields` table: `INSERT INTO allfields (english, spanish) VALUES ('hello', 'hola'), ('goodbye', 'adios');`
+- [ ] Store the command in a `.sql` file:  `scripts/library/030_insert_into_allfields.psql`
 
 ###### Removing Rows from a Table: DELETE FROM
 
-- [ ] Remove one row from the `words` table: `DELETE FROM words WHERE english = 'hello';`
+- [ ] Remove one row from the `allfields` table: `DELETE FROM allfields WHERE english = 'hello';`
 - [ ] Remove all raws from a table: `DELETE FROM <table-name>` or `TRUNCATE <table-name>`
 
-###### Updating a Row
+###### Updating a Row: UPDATE
 
-- [ ] To update the Spanish words in the words table: `UPDATE words SET spanish = 'adios, chao, nos vemos' WHERE spanish = 'adios';`
+- [ ] To update the Spanish words in the allfields table: `UPDATE allfields SET spanish = 'adios, chao, nos vemos' WHERE spanish = 'adios';`
+  UPDATE allfields SET grouping_english = 'StemCellTransplant'  WHERE grouping_english = 'Stem Cell Transplant';
 - [ ] Two other examples from the Postgres [docs](https://www.postgresql.org/docs/9.6/static/dml-update.html): 
   `UPDATE products SET price = 10 WHERE price = 5;`
   `UPDATE products SET price = price * 1.10;`
-
-
 
 ###### Changing the Structure of a Table: ALTER TABLE
 
 Used to add/remove columns and/or constraints, change default values or column data types, rename columns or tables.
 
-- [ ] To add a Portuguese column to the `words` table: `ALTER TABLE words ADD COLUMN portuguese text;`
-- [ ] To drop the Portuguese column to the `words` table: `ALTER TABLE words DROP COLUMN portuguese CASCADE;` (CASCADE tells Postgres to drop everything that may be linked to the column being dropped)
+- [ ] To add a Portuguese column to the `allfields` table: `ALTER TABLE allfields ADD COLUMN portuguese text;`
+- [ ] To drop the Portuguese column to the `allfields` table: `ALTER TABLE allfields DROP COLUMN portuguese CASCADE;` (CASCADE tells Postgres to drop everything that may be linked to the column being dropped)
 - [ ] To change a column name: `ALTER TABLE groupings RENAME COLUMN grouping_spansih TO grouping_spanish;`
 
-# An Introduction to PostgreSQL Foreign Key References
+##### <u>Examples of simple queries</u> from the `allfields` table in our database
 
-In the previous material on SQL we used the phrase "relational database" but didn't delve into what that means. We'll begin to cover the topic of "relationships" in database terms now.
+*"Show me all English and Spanish words related to anemia"*
 
-###### Prerequisites
+*Translates to:* Select the English and Spanish words from the allfields table that are part of Anemia (Anemia is case-sensitive)
 
-- [SQL](https://git.generalassemb.ly/ga-wdi-boston/sql)
+*SQL:* 	`SELECT english, spanish FROM allfields WHERE groupingenglish = 'Anemia';`
 
-###### Objectives
+*Export SQL query results to csv file:* `COPY(SELECT english, spanish FROM allfields WHERE grouping_english = 'Anemia') TO '/Users/beatriz/Desktop/test/anemia-words.csv' DELIMITER ',' CSV HEADER;`
 
-- Add a foreign key reference to an existing table.
-- Update a row setting a reference to the id of a row in another table.
-- Insert a row which includes a reference to the id of a row in another table.
-- Retrieve rows from two tables using a `JOIN` condition
 
-###### Creating Related Tables / Modeling (diagramming) relationships
 
-Model (diagram) new objects (things) and their relationship to existing objects (things).
+*"Show me all English and Spanish words related to Stem Cell Transplant"*
 
-- [ ] Create a related `groupings` table:  `CREATE TABLE groupings(id SERIAL PRIMARY KEY, grouping_english TEXT, grouping_spanish TEXT);`
+*Translates to:* Select the English and Spanish words from the allfields table that are part of Stem Cell Transplant
 
-- [ ] Use the `words` table to populate the `groupings	` table: `INSERT INTO groupings(grouping_english,grouping_spanish) SELECT DISTINCT grouping_english, grouping_spanish FROM words ORDER BY grouping_english;`
+*SQL:* `SELECT english, spanish FROM allfields WHERE groupingenglish = 'stemCellTransplant ' ORDER BY english`
+
+*Export SQL query results to csv file:*  `COPY(SELECT english, spanish FROM allfields WHERE groupingenglish = 'stemCellTransplant ' ORDER BY english) TO '/Users/beatriz/Desktop/test/wordsStemCellTransplants.csv' DELIMITER ',' CSV HEADER;`
+
+#### Creating <u>Related Tables</u> / Modeling (diagramming) relationships
+
+##### Create Two New Tables / Create a 4th table & Add Foreign Key References at the Time of Creating it
+
+Conventionally, *a foreign key reference is named for the singular of the name of the table being referenced, with the column being referenced appended after an underscore* `_`.
+
+We'll create three tables, `words, groupings, and descriptions` whose primary keys will become the foreign keys of a 3rd table named `glossary`.
+
+The table we're populating from `allfields` has the following schema:
+
+`id, groupingenglish, english, groupingspanish, spanish`
+
+- [ ] Create a related `words` table:  `CREATE TABLE words(id SERIAL PRIMARY KEY, english TEXT, spanish TEXT);`
+
+- [ ] Use the `allfields` table to populate the `words	` table: `INSERT INTO words(english,spanish) SELECT english,spanish FROM allfields;`
 
   <hr>
 
-- [ ] Create a related `descriptions` table:  `CREATE TABLE descriptions(id SERIAL PRIMARY KEY, description_english TEXT, description_spanish TEXT);`
+- [ ] Create a related `groupings` table:  `CREATE TABLE groupings(id SERIAL PRIMARY KEY, english TEXT, spanish TEXT);`
 
-- [ ] Use the `words` table to populate the `descriptions	` table: `INSERT INTO descriptions(description_english,description_spanish) SELECT DISTINCT description_english,description_spanish FROM words ORDER BY description_english;`
+- [ ] Use the `allfields` table to populate the `groupings	` table: `INSERT INTO groupings(english,spanish) SELECT DISTINCT groupingenglish, groupingspanish FROM allfields ORDER BY groupingenglish;`
 
-- [ ] Create the SQL scripts noted above.
+  <hr>
+
+- [ ] Create a `glossary` table that will hold foreign keys related to the other 2 tables: `CREATE TABLE glossary(id SERIAL PRIMARY KEY, word_id INTEGER REFERENCES words(id), grouping_id INTEGER REFERENCES groupings(id));`
 
 
 
+#### Adding references from one table to another ==(steps need editing)==
 
-## Adding references from one table to another
+If later, a Portuguese table is created and populated, we can  add its primary key as a foreign key to the glossary table
 
-Conventionally, a foreign key reference is named for the singular of the name of the table being referenced, with the column being referenced appended after an underscore. So if we're adding a reference to the `cities` table and its `id` column we'll create a column called `city_id`. However, _this convention should
-not be followed when there is a semantically superior name available. 
-
-- [ ] Add grouping_id to `words` table: `ALTER TABLE words ADD COLUMN grouping_id INTEGER REFERENCES groupings(id); CREATE INDEX ON words(grouping_id);`
-- [ ] Populate the grouping reference in the `words` table: UPDATE words SET grouping_id = groupings.id FROM groupings WHERE words.grouping_english = groupings.grouping_english AND words.grouping_spanish = groupings.grouping_spanish;
-- [ ] Remove the `grouping_english` and the `grouping_spanish` columns from the `words` table: `ALTER TABLE words DROP COLUMN grouping_english, DROP COLUMN grouping_spanish;`
+- [ ] Add `portuguese_id` to `glossary` table: `ALTER TABLE glossary ADD COLUMN portuguese_id INTEGER REFERENCES portuguese(id); CREATE INDEX ON glossary(portuguese_id);`
+- [ ] Populate the grouping reference in the `glossary` table: UPDATE glossary SET grouping_id = portuguese.id FROM groupings WHERE glossary.english = portuguese.english AND glossary.portuguese = portuguese.portuguese;
+  - ( I need to figure out how this will work because English word, in theory, already exists in glossary table)
+- [ ] Remove the `grouping_english` and the `grouping_spanish` columns from the `glossary` table: `ALTER TABLE glossary DROP COLUMN grouping_english, DROP COLUMN grouping_spanish;`
 
 <hr>
 
-- [ ] Add description_id to `words` table: `ALTER TABLE words ADD COLUMN description_id INTEGER REFERENCES descriptions(id); CREATE INDEX ON words(description_id);`
-- [ ] Populate the description reference in the `words` table: `UPDATE words SET description_id = descriptions.id FROM descriptions WHERE words.description_english = descriptions.description_english AND words.description_spanish = descriptions.description_spanish;`
-- [ ] Remove the `description_english` and the `descriptiong_spanish` columns from the `words` table: `ALTER TABLE words DROP COLUMN description_english, DROP COLUMN description_spanish;`
+###### Retrieving rows from related tables
+
+Example:
+
+Table 1: books - `b`
+
+```plsql
+-- create a table to store information about books
+CREATE TABLE books (
+  id SERIAL PRIMARY KEY,
+  title TEXT,
+  author TEXT,
+  original_language TEXT,
+  first_published INTEGER
+);
+```
+
+Table 2: Authors - `a`
+
+```sql
+CREATE TABLE authors(
+  id SERIAL PRIMARY KEY,
+  name TEXT
+);
+```
+
+Query information from both tables
+
+```sql
+SELECT b.title, a.name
+FROM books b
+INNER JOIN authors a
+  ON b.author_id = a.id
+WHERE a.name IN ('Agatha Christie', 'Ernest Hemingway')
+ORDER BY a.name;
+```
+
+Using our `words` and `groupings` tables:
+
+Table1: words - `w`
+
+```sql
+CR	id SERIAL PRIMARY KEY,
+	english TEXT,
+	spanish TEXT);
+```
+
+Table2: groupings - `g`
+
+```sql
+    id SERIAL PRIMARY KEY,
+    english TEXT,
+    spanish TEXT);
+```
+
+Query:
+
+Request: "I need all the English/Spanish words related to Stem Cell Transplant"
+
+SQL:
+
+I need all: SELECT
+
+English, Spanish, Stem Cell Transplant: Columns, separated with a comma. Are all columns in the same table? If not, we will need a `JOIN`.
+
+Words: table name
+
+```sql
+SELECT w.english, w.spanish, g.english
+FROM words w
+INNER JOIN groupings g
+  ON w.english = g.id
+WHERE g.english IN ('Stem Cell Transplant')
+ORDER BY w.english;
+```
 
 
 
-## Retrieving rows from related tables
+
+
+Find all terms in `glossary` table related to `stem cell transplant`: `SELECT groupings.grouping_id, words.english, words.spanish. FROM groupings JOIN words AS words.grouping_id=groupings.grouping_id;`
+
+`SELECT g.groupingid, w.english, w.spanish FROM glossary g INNER JOIN words w  ON w.wordid = g.groupingid WHERE a.name IN ('stem cell transplant') ORDER BY w.english;`
+
+Parsing the above command:
+
+`SELECT b.title, a.name` where `b` is defined in `FROM` and `a` is defined in `INNER JOIN`
 
 ### Demonstration: Retrieve information about authors and books
 
@@ -941,5 +974,50 @@ You are not expected to create tutorial files as described in [2.1. Introduction
 - [SELECT](http://www.postgresql.org/docs/9.6/static/sql-select.html) -
    detailed documentation of PostgreSQL's version of the SQL `SELECT` command.
 
+Goals for this tutorial
+
+###### Objectives SQL Study
+
+- Learn notational conventions used in the synopses of PostgreSQL commands.
+- Learn the PostgreSQL commands to create a new or remove an existing database.
+- Learn the SQL commands to create or remove a database table.
+- List the SQL commands used to create, read, update, and delete rows in a database table.
+
+###### Objectives of An Intro to Relational Databases
+
+- Create a database table
+- Insert a row or rows into a database table
+- Retrieve a row or rows from a database table
+- Modify a database table after creation
+- Update a row or rows in a database table
+- Delete a row or rows from a database table
+
+###### Objectives for Adding Foreign Keys When Creating Tables
+
+- Add a foreign key reference to an existing table.
+- Update a row setting a reference to the id of a row in another table.
+- Insert a row which includes a reference to the id of a row in another table.
+- Retrieve rows from two tables using a `JOIN` condition
 
 
+
+###### Designing a DB
+
+https://stackoverflow.com/questions/580233/what-are-the-most-important-considerations-when-designing-a-database
+
+https://www.w3schools.com/sql/trysql.asp?filename=trysql_select_join
+
+
+
+###### Importing CSV files
+
+https://infinum.co/the-capsized-eight/superfast-csv-imports-using-postgresqls-copy
+
+
+
+```sql
+SELECT '"' || attname || '"', char_length(attname)
+  FROM pg_attribute
+  WHERE attrelid = 'allfields'::regclass AND attnum > 0
+  ORDER BY attnum;
+```
